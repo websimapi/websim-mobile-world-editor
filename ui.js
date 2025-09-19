@@ -53,12 +53,20 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   function setPaletteOpen(open) {
     picker.setAttribute("aria-hidden", String(!open));
     palette.setAttribute("aria-hidden", String(!open));
+    picker.classList.toggle('open', open); // toggle open class to animate swatch
+    if (open) {
+      drawWheel(); // render when opening
+      // ensure canvas is sized correctly for the expanded view
+      const size = Math.min(220, window.innerWidth * 0.6);
+      wheel.width = wheel.height = 220;
+      wheel.style.width = '220px';
+      wheel.style.height = '220px';
+    }
   }
 
   colorToggle.addEventListener("click", () => {
     const open = picker.getAttribute("aria-hidden") === "true";
     setPaletteOpen(open);
-    if (open) drawWheel(); // render when opening
   });
 
   // color wheel rendering + picking
