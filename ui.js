@@ -155,6 +155,56 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   lastSwatch.style.background = lastColor;
   currentSwatch.style.background = committedColor;
 
+  // AI Texture Generator
+  const aiBtn = document.getElementById('tool-ai-texture');
+  const aiPanel = document.getElementById('ai-texture-panel');
+  const aiClose = document.getElementById('ai-close');
+  const aiInput = document.getElementById('ai-texture-prompt');
+  const aiGen = document.getElementById('ai-generate-btn');
+  const aiLoading = document.getElementById('ai-loading');
+  const aiList = document.getElementById('ai-texture-list');
+  const TX_KEY = 'ai_textures_v1';
+  function loadTextures(){ try{ return JSON.parse(localStorage.getItem(TX_KEY)||'[]'); }catch{ return []; } }
+  function saveTextures(arr){ localStorage.setItem(TX_KEY, JSON.stringify(arr)); }
+  function renderTextures(){
+    const items = loadTextures();
+    aiList.innerHTML = '';
+    items.forEach(t=>{
+      const d = document.createElement('div');
+      d.className = 'thumb';
+      d.title = t.prompt;
+      d.style.backgroundImage = `url(${t.url})`;
+      aiList.appendChild(d);
+    });
+  }
+  function openAI(){ aiPanel.hidden = false; renderTextures(); setTimeout(()=>aiInput?.focus(), 50); }
+  function closeAI(){ aiPanel.hidden = true; }
+  aiBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openAI(); });
+  aiClose?.addEventListener('click', closeAI);
+  aiPanel?.addEventListener('click', (e)=>{ if(e.target===aiPanel) closeAI(); });
+  document.querySelectorAll('.ai-presets .chip').forEach(chip=>{
+    chip.addEventListener('click', ()=> { aiInput.value = chip.dataset.prompt || ''; });
+  });
+  async function generateTexture(prompt){
+    aiLoading.hidden = false; aiGen.disabled = true;
+    try{
+      const result = await websim.imageGen({ prompt: `${prompt}. seamless tiling, texture, high detail, neutral lighting`, aspect_ratio: "1:1" });
+      const url = result?.url;
+      if (url){
+        const items = loadTextures();
+        items.unshift({ id: crypto.randomUUID(), prompt, url, createdAt: Date.now() });
+        saveTextures(items);
+        renderTextures();
+      }
+    } catch(e){ console.warn('AI gen failed', e); }
+    finally { aiLoading.hidden = true; aiGen.disabled = false; }
+  }
+  aiGen?.addEventListener('click', ()=> {
+    const p = (aiInput.value || '').trim();
+    if (!p) return;
+    generateTexture(p);
+  });
+
   slidersWrapper.hidden = true;
   onModeChange("navigate");
   onSizeChange(parseInt(size.value, 10));

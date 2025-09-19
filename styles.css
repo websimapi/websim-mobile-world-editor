@@ -79,7 +79,8 @@ html, body {
 
 .btn svg { width: 22px; height: 22px; }
 
-.buttons-row { display: flex; align-items: center; gap: 6px; width: 100%; }
+.buttons-row { display: flex; align-items: center; gap: 6px; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
+.buttons-row > * { flex: 0 0 auto; scroll-snap-align: start; }
 
 .color-picker {
   display: flex;
@@ -247,3 +248,17 @@ html, body {
 [hidden] {
   display: none !important;
 }
+
+#ai-texture-panel { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: grid; place-items: end center; z-index: 12; padding: 12px; }
+#ai-texture-panel[hidden] { display: none !important; }
+.ai-card { width: min(680px, 100%); background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; box-shadow: var(--shadow); padding: 12px; }
+.ai-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ai-close { width: 32px; height: 32px; border-radius: 8px; }
+.ai-presets { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 8px; }
+.chip { border: 1px solid #e6e6e6; background: #fff; color: var(--fg); padding: 6px 10px; border-radius: 999px; font-size: 12px; }
+.ai-generate { width: 100%; height: 40px; margin: 8px 0; }
+.ai-loading { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.ai-list { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.ai-list .thumb { width: 100%; aspect-ratio: 1/1; border-radius: 8px; background-size: cover; background-position: center; border: 1px solid #e6e6e6; }
+@media (max-width: 560px){ .ai-list { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 380px){ .ai-list { grid-template-columns: repeat(2, 1fr); } }

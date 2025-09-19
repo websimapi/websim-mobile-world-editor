@@ -1,3 +1,5 @@
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,6 +57,10 @@
           <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18" stroke="currentColor" stroke-width="1"/></svg>
         </button>
 
+        <button id="tool-ai-texture" class="btn" aria-pressed="false" aria-label="AI Texture" title="AI Texture">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.5 5 5 .7-3.6 3.7.9 5.3L12 14.9 7.2 16.7l.9-5.3L4.5 7.7l5-.7L12 2z" fill="currentColor"/></svg>
+        </button>
+
         <div id="color-picker" class="color-picker" aria-hidden="true" title="Choose color">
           <button id="color-toggle" class="btn color-btn" aria-pressed="false" aria-label="Color">
             <span class="color-swatch color-last"></span>
@@ -73,8 +79,27 @@
     </button>
   </div>
 
+  <div id="ai-texture-panel" role="dialog" aria-modal="true" hidden>
+    <div class="ai-card">
+      <div class="ai-header">
+        <strong>Generate Texture (AI)</strong>
+        <button id="ai-close" class="btn ai-close" aria-label="Close">✕</button>
+      </div>
+      <div class="ai-presets">
+        <button class="chip" data-prompt="rocky cliff with cracks">Rocky</button>
+        <button class="chip" data-prompt="wet muddy soil">Mud</button>
+        <button class="chip" data-prompt="lush green grass">Grass</button>
+        <button class="chip" data-prompt="snow with subtle noise">Snow</button>
+        <button class="chip" data-prompt="sand dunes ripples">Sand</button>
+      </div>
+      <input id="ai-texture-prompt" type="text" placeholder="Describe a texture (e.g., 'mossy stone with veins')" />
+      <button id="ai-generate-btn" class="btn ai-generate">Generate</button>
+      <div id="ai-loading" class="ai-loading" hidden>Generating… ~10s</div>
+      <div class="ai-list" id="ai-texture-list" aria-live="polite"></div>
+    </div>
+  </div>
+
   <script type="module" src="./main.js"></script>
   <!-- ...existing content... -->
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
