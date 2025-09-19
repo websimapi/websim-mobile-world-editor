@@ -1,5 +1,3 @@
-
-```javascript
 /* ...existing code... */
 export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleGrid, onColorChange }) {
   const btnNav = document.getElementById("mode-navigate");
