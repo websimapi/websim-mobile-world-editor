@@ -148,6 +148,8 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     lastSwatch.style.background = lastColor;
     if (typeof onColorChange === "function") onColorChange(committedColor);
   });
+  // also block click from bubbling to toggle (prevents opening the wheel)
+  lastSwatch.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); });
 
   // initialize default swatch
   lastSwatch.style.background = lastColor;
