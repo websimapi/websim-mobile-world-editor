@@ -53,18 +53,18 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   function setPaletteOpen(open) {
     picker.setAttribute("aria-hidden", String(!open));
     palette.setAttribute("aria-hidden", String(!open));
-    picker.classList.toggle('open', open); // toggle open class to animate swatch
+    picker.classList.toggle('open', open);
     if (open) {
-      drawWheel(); // render when opening
-      // ensure canvas is sized correctly for the expanded view
-      const size = Math.min(220, window.innerWidth * 0.6);
-      wheel.width = wheel.height = 220;
-      wheel.style.width = '220px';
-      wheel.style.height = '220px';
+      const size = 220;
+      wheel.width = wheel.height = size;
+      wheel.style.width = size + 'px';
+      wheel.style.height = size + 'px';
+      drawWheel(); // render after sizing
     }
   }
 
-  colorToggle.addEventListener("click", () => {
+  colorToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
     const open = picker.getAttribute("aria-hidden") === "true";
     setPaletteOpen(open);
   });
@@ -72,8 +72,7 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   // color wheel rendering + picking
   function drawWheel() {
     if (!wheel) return;
-    const size = Math.min(220, window.innerWidth * 0.6);
-    wheel.width = wheel.height = size;
+    const size = wheel.width || 220;
     const ctx = wheel.getContext("2d");
     const cx = size / 2, cy = size / 2, radius = size / 2;
     ctx.clearRect(0,0,size,size);
@@ -87,7 +86,6 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
         let angle = Math.atan2(dy, dx);
         let hue = (angle / (2*Math.PI) + 0.5) * 360;
         let sat = Math.min(1, d / radius);
-        // convert HSV->RGB
         const c = hsvToRgb(hue, sat, 1);
         image.data[idx]=c[0]; image.data[idx+1]=c[1]; image.data[idx+2]=c[2]; image.data[idx+3]=255;
       }
