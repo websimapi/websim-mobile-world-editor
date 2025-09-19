@@ -42,7 +42,7 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
   const mask = new Float32Array(vcount);
   geo.setAttribute('mask', new THREE.BufferAttribute(mask, 1));
   mat.vertexColors = true;
-  mat.onBeforeCompile = () => {}; // ensure material builds with vertex colors
+  // mat.onBeforeCompile = () => {}; // removed to preserve shader uniforms
 
   const widthVerts = segments + 1;
   const height = new Float32Array(vcount); // y only

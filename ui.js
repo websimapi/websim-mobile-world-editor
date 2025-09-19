@@ -206,14 +206,18 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     aiLoading.hidden = false; aiGen.disabled = true;
     try{
       const result = await websim.imageGen({ prompt: `${prompt}. seamless tiling, texture, high detail, neutral lighting`, aspect_ratio: "1:1" });
-      const url = result?.url;
-      if (url){
+      const genUrl = result?.url;
+      if (genUrl){
+        const resp = await fetch(genUrl);
+        const blob = await resp.blob();
+        const file = new File([blob], `ai-texture-${Date.now()}.png`, { type: blob.type || 'image/png' });
+        const uploadedUrl = await websim.upload(file);
         const items = loadTextures();
-        items.unshift({ id: crypto.randomUUID(), prompt, url, createdAt: Date.now() });
+        items.unshift({ id: crypto.randomUUID(), prompt, url: uploadedUrl, createdAt: Date.now() });
         saveTextures(items);
         renderTextures();
       }
-    } catch(e){ console.warn('AI gen failed', e); }
+    } catch(e){ console.warn('AI gen/upload failed', e); }
     finally { aiLoading.hidden = true; aiGen.disabled = false; }
   }
   aiGen?.addEventListener('click', ()=> {
