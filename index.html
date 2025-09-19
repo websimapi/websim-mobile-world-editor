@@ -22,13 +22,22 @@
 
   <div id="ui">
     <div class="toolbar" role="toolbar" aria-label="Terrain editor controls">
-      <button id="mode-navigate" class="btn active" aria-pressed="true" title="Navigate">Navigate</button>
-      <button id="mode-raise" class="btn" aria-pressed="false" title="Raise terrain">Raise</button>
-      <button id="mode-lower" class="btn" aria-pressed="false" title="Lower terrain">Lower</button>
+      <button id="mode-navigate" class="btn active" aria-pressed="true" aria-label="Navigate" title="Navigate">
+        <!-- hand cursor icon -->
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11V6a1 1 0 0 1 2 0v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9 11V5a1 1 0 0 1 2 0v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M11 11V4a1 1 0 0 1 2 0v7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M13 11V6a1 1 0 0 1 2 0v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7 11l-1.2 1.6a2 2 0 0 0-.4 1.2V16a6 6 0 0 0 6 6h2a6 6 0 0 0 6-6v-2.5a1.5 1.5 0 0 0-3 0V11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button id="mode-raise" class="btn" aria-pressed="false" aria-label="Raise terrain" title="Raise">
+        <!-- arrow up icon -->
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="mode-lower" class="btn" aria-pressed="false" aria-label="Lower terrain" title="Lower">
+        <!-- arrow down icon -->
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 13l-6 6-6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
       <div class="spacer"></div>
       <label class="slider">
         <span>Size</span>
-        <input id="brush-size" type="range" min="1" max="30" value="12" />
+        <input id="brush-size" type="range" min="1" max="40" value="12" step="1" />
       </label>
       <label class="slider">
         <span>Strength</span>
@@ -42,4 +51,3 @@
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
-
