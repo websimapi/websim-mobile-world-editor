@@ -9,6 +9,14 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange }) {
 
   const buttons = [btnNav, btnRaise, btnLower];
 
+  const toggle = document.getElementById("toggle-ui");
+  const toolbar = document.querySelector(".toolbar");
+  toggle.addEventListener("click", () => {
+    const nowHidden = !toolbar.hidden ? true : false;
+    toolbar.hidden = nowHidden;
+    toggle.setAttribute("aria-expanded", String(!nowHidden));
+  });
+
   function setActive(btn) {
     buttons.forEach(b => {
       const active = b === btn;

@@ -23,13 +23,13 @@
   <div id="ui">
     <div class="toolbar" role="toolbar" aria-label="Terrain editor controls">
       <div id="sliders" class="sliders-row">
-        <label id="size-slider" class="slider">
-          <span>Size</span>
-          <input id="brush-size" type="range" min="1" max="40" value="12" step="1" />
-        </label>
         <label class="slider">
           <span>Strength</span>
           <input id="brush-strength" type="range" min="1" max="100" value="35" />
+        </label>
+        <label id="size-slider" class="slider">
+          <span>Size</span>
+          <input id="brush-size" type="range" min="1" max="40" value="12" step="1" />
         </label>
       </div>
       <div class="buttons-row">
@@ -48,6 +48,9 @@
         <div class="spacer"></div>
       </div>
     </div>
+    <button id="toggle-ui" aria-label="Toggle controls" aria-expanded="true" title="Show/Hide controls">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c5 0 9.27 3.11 11 7-1.73 3.89-6 7-11 7S2.73 15.89 1 12C2.73 8.11 7 5 12 5zm0 3.5A3.5 3.5 0 1 0 15.5 12 3.5 3.5 0 0 0 12 8.5z" fill="currentColor"/></svg>
+    </button>
   </div>
 
   <script type="module" src="./main.js"></script>
