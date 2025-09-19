@@ -1,3 +1,5 @@
+
+```javascript
 /* ...existing code... */
 export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleGrid, onColorChange }) {
   const btnNav = document.getElementById("mode-navigate");
@@ -47,33 +49,80 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   const picker = document.getElementById("color-picker");
   const colorToggle = document.getElementById("color-toggle");
   const palette = document.getElementById("palette");
-  const swatches = Array.from(palette.querySelectorAll(".swatch"));
+  const wheel = document.getElementById("color-wheel");
   const swatchDisplay = colorToggle.querySelector(".color-swatch");
 
   function setPaletteOpen(open) {
     picker.setAttribute("aria-hidden", String(!open));
-    picker.setAttribute("aria-hidden", open ? "false" : "true");
+    palette.setAttribute("aria-hidden", String(!open));
   }
 
   colorToggle.addEventListener("click", () => {
     const open = picker.getAttribute("aria-hidden") === "true";
     setPaletteOpen(open);
+    if (open) drawWheel(); // render when opening
   });
 
-  swatches.forEach(s => {
-    s.addEventListener("click", () => {
-      swatches.forEach(x => x.classList.remove("selected"));
-      s.classList.add("selected");
-      const color = s.dataset.color;
-      swatchDisplay.style.background = color;
-      setPaletteOpen(false);
-      if (typeof onColorChange === "function") onColorChange(color);
-    });
-  });
+  // color wheel rendering + picking
+  function drawWheel() {
+    if (!wheel) return;
+    const size = Math.min(220, window.innerWidth * 0.6);
+    wheel.width = wheel.height = size;
+    const ctx = wheel.getContext("2d");
+    const cx = size / 2, cy = size / 2, radius = size / 2;
+    ctx.clearRect(0,0,size,size);
+    const image = ctx.createImageData(size, size);
+    for (let y=0;y<size;y++){
+      for (let x=0;x<size;x++){
+        const dx = x - cx, dy = y - cy;
+        const d = Math.sqrt(dx*dx+dy*dy);
+        const idx = (y*size + x)*4;
+        if (d > radius) { image.data[idx+3]=0; continue; }
+        let angle = Math.atan2(dy, dx);
+        let hue = (angle / (2*Math.PI) + 0.5) * 360;
+        let sat = Math.min(1, d / radius);
+        // convert HSV->RGB
+        const c = hsvToRgb(hue, sat, 1);
+        image.data[idx]=c[0]; image.data[idx+1]=c[1]; image.data[idx+2]=c[2]; image.data[idx+3]=255;
+      }
+    }
+    ctx.putImageData(image,0,0);
+  }
 
-  // default selection
-  const first = swatches[0];
-  if (first) { first.classList.add("selected"); swatchDisplay.style.background = first.dataset.color; }
+  function hsvToRgb(h, s, v){
+    let c = v*s, x = c*(1-Math.abs((h/60)%2-1)), m = v-c, r=0,g=0,b=0;
+    if (h<60){r=c;g=x;b=0;} else if (h<120){r=x;g=c;b=0;} else if (h<180){r=0;g=c;b=x;}
+    else if (h<240){r=0;g=x;b=c;} else if (h<300){r=x;g=0;b=c;} else {r=c;g=0;b=x;}
+    return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)];
+  }
+
+  function pickFromWheel(clientX, clientY){
+    if (!wheel) return;
+    const rect = wheel.getBoundingClientRect();
+    const x = clientX - rect.left, y = clientY - rect.top;
+    const cx = rect.width/2, cy = rect.height/2;
+    const dx = x - cx, dy = y - cy;
+    const dist = Math.sqrt(dx*dx+dy*dy);
+    const radius = rect.width/2;
+    if (dist > radius) return;
+    let hue = (Math.atan2(dy, dx) / (2*Math.PI) + 0.5) * 360;
+    let sat = Math.min(1, dist / radius);
+    // convert to hex
+    const rgb = hsvToRgb(hue, sat, 1);
+    const hex = '#' + rgb.map(v => v.toString(16).padStart(2,'0')).join('');
+    swatchDisplay.style.background = hex;
+    if (typeof onColorChange === "function") onColorChange(hex);
+  }
+
+  let dragging = false;
+  if (wheel) {
+    wheel.addEventListener('pointerdown', (e) => { e.preventDefault(); dragging = true; pickFromWheel(e.clientX, e.clientY); });
+    window.addEventListener('pointermove', (e) => { if (dragging) pickFromWheel(e.clientX, e.clientY); });
+    window.addEventListener('pointerup', () => { if (dragging) { dragging = false; setPaletteOpen(false); }});
+  }
+
+  // initialize default swatch
+  swatchDisplay.style.background = '#ff5a5a';
 
   slidersWrapper.hidden = true;
   onModeChange("navigate");

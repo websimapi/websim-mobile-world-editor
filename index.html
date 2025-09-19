@@ -59,16 +59,8 @@
           <button id="color-toggle" class="btn color-btn" aria-pressed="false" aria-label="Color">
             <span class="color-swatch" style="background:#ff5a5a"></span>
           </button>
-          <div class="palette" id="palette">
-            <!-- color options inserted/inline -->
-            <button class="swatch" data-color="#ff5a5a" style="background:#ff5a5a"></button>
-            <button class="swatch" data-color="#ffb86b" style="background:#ffb86b"></button>
-            <button class="swatch" data-color="#ffd66b" style="background:#ffd66b"></button>
-            <button class="swatch" data-color="#8ee07e" style="background:#8ee07e"></button>
-            <button class="swatch" data-color="#5ad1ff" style="background:#5ad1ff"></button>
-            <button class="swatch" data-color="#8c8cff" style="background:#8c8cff"></button>
-            <button class="swatch" data-color="#ffffff" style="background:#ffffff; border:1px solid #ddd"></button>
-            <button class="swatch" data-color="#000000" style="background:#000000"></button>
+          <div class="palette" id="palette" aria-hidden="true">
+            <canvas id="color-wheel" width="220" height="220"></canvas>
           </div>
         </div>
 
