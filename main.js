@@ -29,6 +29,7 @@ scene.add(light, new THREE.AmbientLight(0xffffff, 0.45));
 
 const { mesh: terrain, api: terrainAPI } = createTerrain({ size: 200, segments: 128 });
 scene.add(terrain);
+const texLoader = new THREE.TextureLoader();
 
 // dynamic wireframe that matches terrain
 let wire, wireMat;
@@ -58,10 +59,16 @@ initUI({
   onModeChange: (m) => { state.mode = m; },
   onSizeChange: (v) => { state.size = v; },
   onStrengthChange: (v) => { state.strength = v; },
-  onToggleGrid: (show) => {
-    if (wire) wire.visible = show;
-  },
-  onColorChange: (hex) => { state.color = new THREE.Color(hex); }
+  onToggleGrid: (show) => { if (wire) wire.visible = show; },
+  onColorChange: (hex) => { state.color = new THREE.Color(hex); },
+  onTextureChange: (url) => {
+    if (!url) { terrainAPI.setTexture(null); return; }
+    texLoader.load(url, (t)=> {
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy() || 1);
+      terrainAPI.setTexture(t, 6); // mild tiling
+    });
+  }
 });
 
 // Interaction

@@ -1,5 +1,5 @@
 /* ...existing code... */
-export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleGrid, onColorChange }) {
+export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleGrid, onColorChange, onTextureChange }) {
   const btnNav = document.getElementById("mode-navigate");
   const btnRaise = document.getElementById("mode-raise");
   const btnLower = document.getElementById("mode-lower");
@@ -53,6 +53,7 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   const currentSwatch = colorToggle.querySelector(".color-current");
   let currentColor = '#ff5a5a', committedColor = '#ff5a5a', lastColor = '#ff5a5a', openingColor = null;
   let selectedTexture = localStorage.getItem('ai_selected_texture') || null;
+  if (selectedTexture && typeof onTextureChange === 'function') onTextureChange(selectedTexture);
 
   function setPaletteOpen(open) {
     picker.setAttribute("aria-hidden", String(!open));
@@ -187,6 +188,7 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
         localStorage.setItem('ai_selected_texture', selectedTexture);
         currentSwatch.style.backgroundImage = `url(${selectedTexture})`;
         currentSwatch.style.backgroundColor = committedColor;
+        if (typeof onTextureChange === 'function') onTextureChange(selectedTexture);
         closeAI();
       });
       aiList.appendChild(d);

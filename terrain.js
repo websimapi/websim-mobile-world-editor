@@ -12,6 +12,20 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
     flatShading: false,
     side: THREE.DoubleSide
   });
+  /* inject shader to mix texture by mask and tint by vertex color */
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.uTex = { value: null };
+    shader.uniforms.uUseTex = { value: 0 };
+    shader.uniforms.uTiling = { value: 4.0 };
+    shader.vertexShader = shader.vertexShader
+      .replace('varying vec3 vViewPosition;', 'varying vec3 vViewPosition;\nvarying float vMask;\nattribute float mask;')
+      .replace('#include <color_vertex>', '#include <color_vertex>\n vMask = mask;');
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <color_fragment>',
+      '#include <color_fragment>\nuniform sampler2D uTex; uniform float uUseTex; uniform float uTiling;\nvec3 texRGB = texture2D(uTex, vUv * uTiling).rgb;\ndiffuseColor.rgb = mix(diffuseColor.rgb, texRGB * diffuseColor.rgb, vMask * uUseTex);'
+    );
+    mat.userData.shader = shader;
+  };
 
   const mesh = new THREE.Mesh(geo, mat);
   mesh.receiveShadow = false;
@@ -24,6 +38,9 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
   const colors = new Float32Array(vcount * 3);
   for (let i = 0; i < vcount; i++) { colors[i * 3 + 0] = 0.87; colors[i * 3 + 1] = 0.87; colors[i * 3 + 2] = 0.87; }
   geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  /* add per-vertex mask for texture blending */
+  const mask = new Float32Array(vcount);
+  geo.setAttribute('mask', new THREE.BufferAttribute(mask, 1));
   mat.vertexColors = true;
   mat.onBeforeCompile = () => {}; // ensure material builds with vertex colors
 
@@ -78,6 +95,7 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
         colors[ci + 0] = colors[ci + 0] + (color.r - colors[ci + 0]) * (strength * falloff);
         colors[ci + 1] = colors[ci + 1] + (color.g - colors[ci + 1]) * (strength * falloff);
         colors[ci + 2] = colors[ci + 2] + (color.b - colors[ci + 2]) * (strength * falloff);
+        mask[idx] = Math.min(1, mask[idx] + strength * falloff); // grow texture mask
       }
     }
   }
@@ -104,7 +122,16 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
       applyBrush,
       applyPaint,
       sync,
-      onUpdate: (fn) => { if (typeof fn === "function") listeners.push(fn); }
+      onUpdate: (fn) => { if (typeof fn === "function") listeners.push(fn); },
+      setTexture(tex, tiling = 4) {
+        const sh = mat.userData.shader;
+        if (!sh) return;
+        sh.uniforms.uTex.value = tex || null;
+        sh.uniforms.uUseTex.value = tex ? 1 : 0;
+        sh.uniforms.uTiling.value = tiling;
+        mat.needsUpdate = true;
+        geo.attributes.mask.needsUpdate = true;
+      }
     }
   };
 }
