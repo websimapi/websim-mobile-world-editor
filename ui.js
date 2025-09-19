@@ -50,13 +50,14 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   const wheel = document.getElementById("color-wheel");
   const lastSwatch = colorToggle.querySelector(".color-last");
   const currentSwatch = colorToggle.querySelector(".color-current");
-  let currentColor = '#ff5a5a';
+  let currentColor = '#ff5a5a', committedColor = '#ff5a5a', lastColor = '#ff5a5a', openingColor = null;
 
   function setPaletteOpen(open) {
     picker.setAttribute("aria-hidden", String(!open));
     palette.setAttribute("aria-hidden", String(!open));
     picker.classList.toggle('open', open);
     if (open) {
+      openingColor = committedColor;
       const size = 220;
       wheel.width = wheel.height = size;
       wheel.style.width = size + 'px';
@@ -113,10 +114,8 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     if (dist > radius) return;
     let hue = (Math.atan2(dy, dx) / (2*Math.PI) + 0.5) * 360;
     let sat = Math.min(1, dist / radius);
-    // convert to hex
     const rgb = hsvToRgb(hue, sat, 1);
     const hex = '#' + rgb.map(v => v.toString(16).padStart(2,'0')).join('');
-    lastSwatch.style.background = currentSwatch.style.background || currentColor;
     currentColor = hex;
     currentSwatch.style.background = hex;
     if (typeof onColorChange === "function") onColorChange(hex);
@@ -126,23 +125,33 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   if (wheel) {
     wheel.addEventListener('pointerdown', (e) => { e.preventDefault(); dragging = true; pickFromWheel(e.clientX, e.clientY); });
     window.addEventListener('pointermove', (e) => { if (dragging) pickFromWheel(e.clientX, e.clientY); });
-    window.addEventListener('pointerup', () => { if (dragging) { dragging = false; setPaletteOpen(false); }});
+    window.addEventListener('pointerup', () => {
+      if (dragging) {
+        dragging = false;
+        lastColor = openingColor || committedColor;
+        lastSwatch.style.background = lastColor;
+        committedColor = currentColor;
+        setPaletteOpen(false);
+      }
+    });
   }
 
   // quick-swap last/current color by tapping the small top-left circle
   lastSwatch.addEventListener('pointerdown', (e) => {
     e.preventDefault(); e.stopPropagation();
-    const prevCurrent = currentSwatch.style.background || currentColor;
-    const prevLast = lastSwatch.style.background || prevCurrent;
-    currentSwatch.style.background = prevLast;
-    lastSwatch.style.background = prevCurrent;
-    currentColor = prevLast;
-    if (typeof onColorChange === "function") onColorChange(currentColor);
+    const newCurrent = lastColor;
+    const newLast = committedColor;
+    committedColor = newCurrent;
+    lastColor = newLast;
+    currentColor = committedColor;
+    currentSwatch.style.background = committedColor;
+    lastSwatch.style.background = lastColor;
+    if (typeof onColorChange === "function") onColorChange(committedColor);
   });
 
   // initialize default swatch
-  lastSwatch.style.background = currentColor;
-  currentSwatch.style.background = currentColor;
+  lastSwatch.style.background = lastColor;
+  currentSwatch.style.background = committedColor;
 
   slidersWrapper.hidden = true;
   onModeChange("navigate");
