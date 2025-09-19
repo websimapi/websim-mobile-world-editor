@@ -151,11 +151,9 @@ export function applyPaintAt(api, worldPoint, brushSize, strength, color) {
   const { worldToGrid, applyPaint, sync, segments } = api;
   const { i, j } = worldToGrid(worldPoint.x, worldPoint.z);
   const radius = Math.max(1, Math.min(brushSize | 0, segments));
-  // color is THREE.Color
-  // map UI strength (0..1) to a stronger paint influence for visible results
   applyPaint({ i, j }, radius, color, strength * 0.6);
-  // update color attribute
   api.mesh.geometry.attributes.color.needsUpdate = true;
+  api.mesh.geometry.attributes.mask.needsUpdate = true; // ensure texture mask updates
   sync();
 }
 /* ...existing code... */
