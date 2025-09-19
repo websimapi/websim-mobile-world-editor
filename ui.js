@@ -51,6 +51,7 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   const lastSwatch = colorToggle.querySelector(".color-last");
   const currentSwatch = colorToggle.querySelector(".color-current");
   let currentColor = '#ff5a5a', committedColor = '#ff5a5a', lastColor = '#ff5a5a', openingColor = null;
+  let currentTextureUrl = localStorage.getItem('ai_selected_texture') || null;
 
   function setPaletteOpen(open) {
     picker.setAttribute("aria-hidden", String(!open));
@@ -117,8 +118,18 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     const rgb = hsvToRgb(hue, sat, 1);
     const hex = '#' + rgb.map(v => v.toString(16).padStart(2,'0')).join('');
     currentColor = hex;
-    currentSwatch.style.background = hex;
+    applySwatch(currentColor, currentTextureUrl);
     if (typeof onColorChange === "function") onColorChange(hex);
+  }
+
+  function applySwatch(colorHex, textureUrl){
+    if (textureUrl) {
+      currentSwatch.style.backgroundImage = `linear-gradient(${colorHex}cc, ${colorHex}cc), url(${textureUrl})`;
+      currentSwatch.style.backgroundColor = '';
+    } else {
+      currentSwatch.style.backgroundImage = '';
+      currentSwatch.style.backgroundColor = colorHex;
+    }
   }
 
   let dragging = false;
@@ -144,8 +155,8 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     committedColor = newCurrent;
     lastColor = newLast;
     currentColor = committedColor;
-    currentSwatch.style.background = committedColor;
-    lastSwatch.style.background = lastColor;
+    currentSwatch.style.background = committedColor; // remove direct set
+    applySwatch(committedColor, currentTextureUrl);
     if (typeof onColorChange === "function") onColorChange(committedColor);
   });
   // also block click from bubbling to toggle (prevents opening the wheel)
@@ -153,7 +164,7 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
 
   // initialize default swatch
   lastSwatch.style.background = lastColor;
-  currentSwatch.style.background = committedColor;
+  applySwatch(committedColor, currentTextureUrl);
 
   // AI Texture Generator
   const aiBtn = document.getElementById('tool-ai-texture');
@@ -174,6 +185,11 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
       d.className = 'thumb';
       d.title = t.prompt;
       d.style.backgroundImage = `url(${t.url})`;
+      d.addEventListener('click', ()=>{
+        currentTextureUrl = t.url;
+        localStorage.setItem('ai_selected_texture', currentTextureUrl);
+        applySwatch(committedColor, currentTextureUrl);
+      });
       aiList.appendChild(d);
     });
   }
