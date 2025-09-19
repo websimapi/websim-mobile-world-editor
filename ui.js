@@ -1,8 +1,9 @@
 /* ...existing code... */
-export function initUI({ onModeChange, onSizeChange, onStrengthChange }) {
+export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleGrid }) {
   const btnNav = document.getElementById("mode-navigate");
   const btnRaise = document.getElementById("mode-raise");
   const btnLower = document.getElementById("mode-lower");
+  const btnGrid = document.getElementById("toggle-grid");
   const size = document.getElementById("brush-size");
   const strength = document.getElementById("brush-strength");
   const slidersWrapper = document.getElementById("sliders");
@@ -28,6 +29,14 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange }) {
   btnNav.addEventListener("click", () => { setActive(btnNav); slidersWrapper.hidden = true; onModeChange("navigate"); });
   btnRaise.addEventListener("click", () => { setActive(btnRaise); slidersWrapper.hidden = false; onModeChange("raise"); });
   btnLower.addEventListener("click", () => { setActive(btnLower); slidersWrapper.hidden = false; onModeChange("lower"); });
+
+  if (btnGrid) {
+    btnGrid.addEventListener("click", () => {
+      const now = btnGrid.getAttribute("aria-pressed") === "true";
+      btnGrid.setAttribute("aria-pressed", String(!now));
+      if (typeof onToggleGrid === "function") onToggleGrid(!now);
+    });
+  }
 
   size.addEventListener("input", () => onSizeChange(parseInt(size.value, 10)));
   strength.addEventListener("input", () => onStrengthChange(parseInt(strength.value, 10) / 100));

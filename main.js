@@ -56,7 +56,10 @@ import { initUI } from "./ui.js";
 initUI({
   onModeChange: (m) => { state.mode = m; },
   onSizeChange: (v) => { state.size = v; },
-  onStrengthChange: (v) => { state.strength = v; }
+  onStrengthChange: (v) => { state.strength = v; },
+  onToggleGrid: (show) => {
+    if (wire) wire.visible = show;
+  }
 });
 
 // Interaction
