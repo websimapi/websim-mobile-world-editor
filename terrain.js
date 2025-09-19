@@ -94,6 +94,7 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
   return {
     mesh,
     api: {
+      mesh,           // expose mesh so external helpers (applyPaintAt) can update attributes
       segments,
       size,
       widthVerts,
