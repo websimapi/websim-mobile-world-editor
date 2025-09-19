@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { createTerrain, applyBrushAt } from "./terrain.js";
+import { createTerrain, applyBrushAt, applyPaintAt } from "./terrain.js";
 /* ...existing code... */
 
 const canvas = document.getElementById("c");
@@ -46,9 +46,10 @@ const pointer = new THREE.Vector2();
 let isPointerDown = false;
 
 const state = {
-  mode: "navigate", // navigate | raise | lower
+  mode: "navigate", // navigate | raise | lower | paint
   size: 12,
-  strength: 0.35
+  strength: 0.35,
+  color: new THREE.Color(0xff5a5a)
 };
 
 // UI wiring
@@ -59,7 +60,8 @@ initUI({
   onStrengthChange: (v) => { state.strength = v; },
   onToggleGrid: (show) => {
     if (wire) wire.visible = show;
-  }
+  },
+  onColorChange: (hex) => { state.color = new THREE.Color(hex); }
 });
 
 // Interaction
@@ -74,6 +76,10 @@ function sculptAtPointer() {
   raycaster.setFromCamera(pointer, camera);
   const hit = raycaster.intersectObject(terrain, false)[0];
   if (!hit) return;
+  if (state.mode === "paint") {
+    applyPaintAt(terrainAPI, hit.point, state.size, state.strength, state.color);
+    return;
+  }
   const dir = state.mode === "lower" ? -1 : 1;
   applyBrushAt(terrainAPI, hit.point, state.size, state.strength * dir);
 }

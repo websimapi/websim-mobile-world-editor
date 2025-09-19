@@ -20,6 +20,13 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
   // Height field
   const verts = geo.attributes.position;
   const vcount = verts.count;
+  // add color attribute (default grey)
+  const colors = new Float32Array(vcount * 3);
+  for (let i = 0; i < vcount; i++) { colors[i * 3 + 0] = 0.87; colors[i * 3 + 1] = 0.87; colors[i * 3 + 2] = 0.87; }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  mat.vertexColors = true;
+  mat.onBeforeCompile = () => {}; // ensure material builds with vertex colors
+
   const widthVerts = segments + 1;
   const height = new Float32Array(vcount); // y only
   const listeners = [];
@@ -52,6 +59,29 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
     }
   }
 
+  function applyPaint(center, radius, color, strength) {
+    const r2 = radius * radius;
+    for (let j = -radius; j <= radius; j++) {
+      for (let i = -radius; i <= radius; i++) {
+        const gx = center.i + i;
+        const gz = center.j + j;
+        if (gx < 0 || gz < 0 || gx > segments || gz > segments) continue;
+        const dx = i;
+        const dz = j;
+        const dist2 = dx * dx + dz * dz;
+        if (dist2 > r2) continue;
+        const idx = gz * widthVerts + gx;
+        const t = 1 - dist2 / r2;
+        const falloff = t * t * (3 - 2 * t);
+        // lerp existing color toward target color by strength*falloff
+        const ci = idx * 3;
+        colors[ci + 0] = colors[ci + 0] + (color.r - colors[ci + 0]) * (strength * falloff);
+        colors[ci + 1] = colors[ci + 1] + (color.g - colors[ci + 1]) * (strength * falloff);
+        colors[ci + 2] = colors[ci + 2] + (color.b - colors[ci + 2]) * (strength * falloff);
+      }
+    }
+  }
+
   function sync() {
     for (let idx = 0; idx < vcount; idx++) {
       verts.setY(idx, height[idx]);
@@ -71,6 +101,7 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
       height,
       worldToGrid,
       applyBrush,
+      applyPaint,
       sync,
       onUpdate: (fn) => { if (typeof fn === "function") listeners.push(fn); }
     }
@@ -85,6 +116,17 @@ export function applyBrushAt(api, worldPoint, brushSize, strength) {
   const radius = Math.max(1, Math.min(brushSize | 0, segments));
   // Apply scaled delta
   applyBrush({ i, j }, radius, strength * 0.25); // mild multiplier for stability
+  sync();
+}
+
+export function applyPaintAt(api, worldPoint, brushSize, strength, color) {
+  const { worldToGrid, applyPaint, sync, segments } = api;
+  const { i, j } = worldToGrid(worldPoint.x, worldPoint.z);
+  const radius = Math.max(1, Math.min(brushSize | 0, segments));
+  // color is THREE.Color
+  applyPaint({ i, j }, radius, color, strength * 0.025); // tuned multiplier
+  // update color attribute
+  api.mesh.geometry.attributes.color.needsUpdate = true;
   sync();
 }
 /* ...existing code... */

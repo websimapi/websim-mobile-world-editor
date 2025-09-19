@@ -81,6 +81,70 @@ html, body {
 
 .buttons-row { display: flex; align-items: center; gap: 6px; width: 100%; }
 
+.color-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.color-btn { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; border-radius: 12px; }
+
+.color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: block;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.palette {
+  position: absolute;
+  bottom: 56px;
+  left: 0;
+  display: flex;
+  gap: 8px;
+  background: rgba(255,255,255,0.95);
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  transform-origin: bottom left;
+  transition: transform 160ms ease, opacity 160ms ease;
+  opacity: 0;
+  transform: scale(0.85);
+  pointer-events: none;
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.color-picker[aria-hidden="false"] .palette {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.palette .swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  display: inline-block;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.palette .swatch:active,
+.palette .swatch.selected { transform: scale(1.15); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+
+/* keep palette compact on small screens */
+@media (max-width: 420px) {
+  .palette { bottom: 64px; left: -4px; gap: 6px; padding: 6px; }
+  .palette .swatch { width: 32px; height: 32px; }
+}
+
 .sliders-row {
   display: flex;
   align-items: stretch;
