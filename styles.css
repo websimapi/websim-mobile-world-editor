@@ -1,3 +1,5 @@
+
+```
 /* ...existing styles... */
 :root {
   --bg: #ffffff;
@@ -124,4 +126,14 @@ html, body {
   background: #111;
   border: 2px solid #111;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+#size-slider {
+  gap: 6px;
+  font-size: 11px;
+}
+
+#size-slider input[type="range"] {
+  width: 120px;
+  height: 32px;
 }

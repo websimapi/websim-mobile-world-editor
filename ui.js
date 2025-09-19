@@ -5,6 +5,7 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange }) {
   const btnLower = document.getElementById("mode-lower");
   const size = document.getElementById("brush-size");
   const strength = document.getElementById("brush-strength");
+  const sizeWrapper = document.getElementById("size-slider");
 
   const buttons = [btnNav, btnRaise, btnLower];
 
@@ -16,17 +17,17 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange }) {
     });
   }
 
-  btnNav.addEventListener("click", () => { setActive(btnNav); onModeChange("navigate"); });
-  btnRaise.addEventListener("click", () => { setActive(btnRaise); onModeChange("raise"); });
-  btnLower.addEventListener("click", () => { setActive(btnLower); onModeChange("lower"); });
+  btnNav.addEventListener("click", () => { setActive(btnNav); sizeWrapper.hidden = true; onModeChange("navigate"); });
+  btnRaise.addEventListener("click", () => { setActive(btnRaise); sizeWrapper.hidden = false; onModeChange("raise"); });
+  btnLower.addEventListener("click", () => { setActive(btnLower); sizeWrapper.hidden = false; onModeChange("lower"); });
 
   size.addEventListener("input", () => onSizeChange(parseInt(size.value, 10)));
   strength.addEventListener("input", () => onStrengthChange(parseInt(strength.value, 10) / 100));
 
   // Initialize callbacks with current values
+  sizeWrapper.hidden = true;
   onModeChange("navigate");
   onSizeChange(parseInt(size.value, 10));
   onStrengthChange(parseInt(strength.value, 10) / 100);
 }
 /* ...existing code... */
-
