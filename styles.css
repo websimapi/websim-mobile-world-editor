@@ -102,15 +102,10 @@ html, body {
 
 /* when opening, grow the small circle into the big color wheel visual */
 .color-picker.open .color-swatch {
-  width: 220px;
-  height: 220px;
-  top: -236px; /* place so expanded circle sits where the palette would */
-  left: -88px;
-  border-radius: 50%;
-  box-shadow: var(--shadow);
-  border: 1px solid rgba(0,0,0,0.06);
-  background: transparent; /* canvas will show through */
-  pointer-events: none; /* allow interactions with the canvas below */
+  width: 12px;
+  height: 12px;
+  top: 6px;
+  left: 6px;
 }
 
 .palette {
