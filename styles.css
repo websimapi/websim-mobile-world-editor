@@ -33,6 +33,7 @@ html, body {
   padding: 8px;
   padding-bottom: calc(8px + var(--safe));
   pointer-events: none;
+  z-index: 10;
 }
 
 .toolbar {
@@ -132,4 +133,9 @@ html, body {
   place-items: center;
   box-shadow: var(--shadow);
   pointer-events: auto;
+  z-index: 11;
+}
+
+[hidden] {
+  display: none !important;
 }
