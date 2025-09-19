@@ -27,12 +27,19 @@ const light = new THREE.DirectionalLight(0xffffff, 1.0);
 light.position.set(1, 2, 1);
 scene.add(light, new THREE.AmbientLight(0xffffff, 0.45));
 
-const grid = new THREE.GridHelper(200, 20, 0xcccccc, 0xeaeaea);
-grid.position.y = 0.001;
-scene.add(grid);
-
 const { mesh: terrain, api: terrainAPI } = createTerrain({ size: 200, segments: 128 });
 scene.add(terrain);
+
+// dynamic wireframe that matches terrain
+let wire, wireMat;
+function buildWire() {
+  const geo = new THREE.WireframeGeometry(terrain.geometry);
+  if (!wireMat) wireMat = new THREE.LineBasicMaterial({ color: 0xcccccc, transparent: true, opacity: 0.6 });
+  if (!wire) { wire = new THREE.LineSegments(geo, wireMat); wire.renderOrder = 1; scene.add(wire); }
+  else { wire.geometry.dispose(); wire.geometry = geo; }
+}
+buildWire();
+terrainAPI.onUpdate(buildWire);
 
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -105,4 +112,3 @@ renderer.setAnimationLoop(() => {
   renderer.render(scene, camera);
 });
 /* ...existing code... */
-

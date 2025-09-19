@@ -22,6 +22,7 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
   const vcount = verts.count;
   const widthVerts = segments + 1;
   const height = new Float32Array(vcount); // y only
+  const listeners = [];
 
   // API helpers
   const halfSize = size / 2;
@@ -57,6 +58,7 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
     }
     verts.needsUpdate = true;
     geo.computeVertexNormals();
+    listeners.forEach(fn => fn());
   }
 
   return {
@@ -69,7 +71,8 @@ export function createTerrain({ size = 200, segments = 128 } = {}) {
       height,
       worldToGrid,
       applyBrush,
-      sync
+      sync,
+      onUpdate: (fn) => { if (typeof fn === "function") listeners.push(fn); }
     }
   };
 }
@@ -85,4 +88,3 @@ export function applyBrushAt(api, worldPoint, brushSize, strength) {
   sync();
 }
 /* ...existing code... */
-
