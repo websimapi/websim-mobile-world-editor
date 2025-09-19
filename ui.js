@@ -129,6 +129,17 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     window.addEventListener('pointerup', () => { if (dragging) { dragging = false; setPaletteOpen(false); }});
   }
 
+  // quick-swap last/current color by tapping the small top-left circle
+  lastSwatch.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const prevCurrent = currentSwatch.style.background || currentColor;
+    const prevLast = lastSwatch.style.background || prevCurrent;
+    currentSwatch.style.background = prevLast;
+    lastSwatch.style.background = prevCurrent;
+    currentColor = prevLast;
+    if (typeof onColorChange === "function") onColorChange(currentColor);
+  });
+
   // initialize default swatch
   lastSwatch.style.background = currentColor;
   currentSwatch.style.background = currentColor;
