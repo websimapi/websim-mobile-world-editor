@@ -8,6 +8,7 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   const size = document.getElementById("brush-size");
   const strength = document.getElementById("brush-strength");
   const slidersWrapper = document.getElementById("sliders");
+  const slidersToggle = document.getElementById("toggle-sliders");
 
   const buttons = [btnNav, btnRaise, btnLower, btnPaint];
 
@@ -27,10 +28,10 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     });
   }
 
-  btnNav.addEventListener("click", () => { setActive(btnNav); slidersWrapper.hidden = true; onModeChange("navigate"); });
-  btnRaise.addEventListener("click", () => { setActive(btnRaise); slidersWrapper.hidden = false; onModeChange("raise"); });
-  btnLower.addEventListener("click", () => { setActive(btnLower); slidersWrapper.hidden = false; onModeChange("lower"); });
-  btnPaint.addEventListener("click", () => { setActive(btnPaint); slidersWrapper.hidden = false; onModeChange("paint"); });
+  btnNav.addEventListener("click", () => { setActive(btnNav); /* no auto-open sliders */ onModeChange("navigate"); });
+  btnRaise.addEventListener("click", () => { setActive(btnRaise); onModeChange("raise"); });
+  btnLower.addEventListener("click", () => { setActive(btnLower); onModeChange("lower"); });
+  btnPaint.addEventListener("click", () => { setActive(btnPaint); onModeChange("paint"); });
 
   if (btnGrid) {
     btnGrid.addEventListener("click", () => {
@@ -51,7 +52,7 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   const lastSwatch = colorToggle.querySelector(".color-last");
   const currentSwatch = colorToggle.querySelector(".color-current");
   let currentColor = '#ff5a5a', committedColor = '#ff5a5a', lastColor = '#ff5a5a', openingColor = null;
-  let currentTextureUrl = localStorage.getItem('ai_selected_texture') || null;
+  let selectedTexture = localStorage.getItem('ai_selected_texture') || null;
 
   function setPaletteOpen(open) {
     picker.setAttribute("aria-hidden", String(!open));
@@ -118,18 +119,10 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     const rgb = hsvToRgb(hue, sat, 1);
     const hex = '#' + rgb.map(v => v.toString(16).padStart(2,'0')).join('');
     currentColor = hex;
-    applySwatch(currentColor, currentTextureUrl);
+    currentSwatch.style.backgroundColor = hex;
+    if (selectedTexture) currentSwatch.style.backgroundImage = `url(${selectedTexture})`;
+    else currentSwatch.style.backgroundImage = '';
     if (typeof onColorChange === "function") onColorChange(hex);
-  }
-
-  function applySwatch(colorHex, textureUrl){
-    if (textureUrl) {
-      currentSwatch.style.backgroundImage = `linear-gradient(${colorHex}cc, ${colorHex}cc), url(${textureUrl})`;
-      currentSwatch.style.backgroundColor = '';
-    } else {
-      currentSwatch.style.backgroundImage = '';
-      currentSwatch.style.backgroundColor = colorHex;
-    }
   }
 
   let dragging = false;
@@ -155,8 +148,10 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     committedColor = newCurrent;
     lastColor = newLast;
     currentColor = committedColor;
-    currentSwatch.style.background = committedColor; // remove direct set
-    applySwatch(committedColor, currentTextureUrl);
+    currentSwatch.style.background = committedColor;
+    currentSwatch.style.backgroundColor = committedColor;
+    if (selectedTexture) currentSwatch.style.backgroundImage = `url(${selectedTexture})`;
+    else currentSwatch.style.backgroundImage = '';
     if (typeof onColorChange === "function") onColorChange(committedColor);
   });
   // also block click from bubbling to toggle (prevents opening the wheel)
@@ -164,7 +159,9 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
 
   // initialize default swatch
   lastSwatch.style.background = lastColor;
-  applySwatch(committedColor, currentTextureUrl);
+  currentSwatch.style.background = committedColor;
+  currentSwatch.style.backgroundColor = committedColor;
+  if (selectedTexture) currentSwatch.style.backgroundImage = `url(${selectedTexture})`;
 
   // AI Texture Generator
   const aiBtn = document.getElementById('tool-ai-texture');
@@ -185,10 +182,12 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
       d.className = 'thumb';
       d.title = t.prompt;
       d.style.backgroundImage = `url(${t.url})`;
-      d.addEventListener('click', ()=>{
-        currentTextureUrl = t.url;
-        localStorage.setItem('ai_selected_texture', currentTextureUrl);
-        applySwatch(committedColor, currentTextureUrl);
+      d.addEventListener('click', ()=> {
+        selectedTexture = t.url;
+        localStorage.setItem('ai_selected_texture', selectedTexture);
+        currentSwatch.style.backgroundImage = `url(${selectedTexture})`;
+        currentSwatch.style.backgroundColor = committedColor;
+        closeAI();
       });
       aiList.appendChild(d);
     });
@@ -220,6 +219,9 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     if (!p) return;
     generateTexture(p);
   });
+
+  slidersToggle?.addEventListener("click", (e)=>{ e.preventDefault(); slidersWrapper.hidden = !slidersWrapper.hidden; });
+  document.addEventListener("click", (e)=>{ if (!toolbar.contains(e.target)) slidersWrapper.hidden = true; }, { passive: true });
 
   slidersWrapper.hidden = true;
   onModeChange("navigate");

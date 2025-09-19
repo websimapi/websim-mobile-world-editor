@@ -115,8 +115,7 @@ html, body {
   z-index: 2;
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
-  overflow: hidden;
+  background-blend-mode: multiply;
 }
 
 /* when opening, grow the small circle into the big color wheel visual */
@@ -195,10 +194,13 @@ html, body {
 }
 
 .sliders-row {
-  /* reduce interference area */
-  pointer-events: none;
-  opacity: 0.2;
-  transition: opacity 120ms ease;
+  display: flex;
+  align-items: stretch;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  pointer-events: auto;
+  touch-action: pan-y;
 }
 
 .slider {
@@ -210,30 +212,15 @@ html, body {
 }
 
 .slider input[type="range"] {
-  pointer-events: auto; /* only the slider itself is interactive */
   width: 140px;
-  height: 26px;
-  background: transparent;
+  height: 32px;
 }
 
 .slider input[type="range"]::-webkit-slider-runnable-track {
-  height: 6px;
-  background: transparent; /* hide track */
-  border: none;
-}
-
-.slider input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px; height: 18px; border-radius: 50%;
-  background: #111; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  margin-top: -6px;
-}
-
-.slider:focus-within ~ .sliders-row,
-.slider:focus-within,
-.slider input[type="range"]:focus,
-.slider input[type="range"]:active {
-  opacity: 1;
+  height: 10px;
+  background: #e9e9e9;
+  border-radius: 999px;
+  border: 1px solid #e3e3e3;
 }
 
 #size-slider {
