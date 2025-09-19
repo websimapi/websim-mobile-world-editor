@@ -48,7 +48,9 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   const colorToggle = document.getElementById("color-toggle");
   const palette = document.getElementById("palette");
   const wheel = document.getElementById("color-wheel");
-  const swatchDisplay = colorToggle.querySelector(".color-swatch");
+  const lastSwatch = colorToggle.querySelector(".color-last");
+  const currentSwatch = colorToggle.querySelector(".color-current");
+  let currentColor = '#ff5a5a';
 
   function setPaletteOpen(open) {
     picker.setAttribute("aria-hidden", String(!open));
@@ -114,7 +116,9 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
     // convert to hex
     const rgb = hsvToRgb(hue, sat, 1);
     const hex = '#' + rgb.map(v => v.toString(16).padStart(2,'0')).join('');
-    swatchDisplay.style.background = hex;
+    lastSwatch.style.background = currentSwatch.style.background || currentColor;
+    currentColor = hex;
+    currentSwatch.style.background = hex;
     if (typeof onColorChange === "function") onColorChange(hex);
   }
 
@@ -126,7 +130,8 @@ export function initUI({ onModeChange, onSizeChange, onStrengthChange, onToggleG
   }
 
   // initialize default swatch
-  swatchDisplay.style.background = '#ff5a5a';
+  lastSwatch.style.background = currentColor;
+  currentSwatch.style.background = currentColor;
 
   slidersWrapper.hidden = true;
   onModeChange("navigate");
